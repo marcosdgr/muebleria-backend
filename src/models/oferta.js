@@ -6,7 +6,7 @@ const ofertaSchema = new mongoose.Schema({
   subtitulo: { type: String, required: true },
   descripcion: { type: String, required: true },
   ofertaActiva: { type: Boolean, required: true, default: true },
-  fechaDeLaOferta: { type: Date, required: true },
+  // fechaDeLaOferta: { type: Date, required: true },
 
 })
 
