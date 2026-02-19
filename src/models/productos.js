@@ -4,7 +4,7 @@ const productoSchema = new mongoose.Schema({
   titulo: { type: String, required: true },
   imagenProducto: { type: String, required: true },
   precioActual: { type: Number, required: true },
-  precioAnterior: { type: Number, required: true },
+  precioAnterior: { type: Number},
   productoActivo: { type: Boolean, required: true, default: true },
 
 });

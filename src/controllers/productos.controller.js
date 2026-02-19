@@ -1,3 +1,4 @@
+import { cloudinaryUpload } from '../helpers/cloduniaryHelpers.js';
 import productos from '../models/productos.js';
 
 export const getProductos = async (req, res) => {
@@ -14,7 +15,23 @@ export const getProductos = async (req, res) => {
 
 export const createProducto = async (req, res) => {
   try {
-    const nuevoProducto = new productos(req.body);
+    const imagenProducto = req.file;
+
+    // Validar que existe la imagen
+    if (!imagenProducto) {
+      return res.status(400).json({ message: 'La imagen es requerida' });
+    }
+
+    // Subir imagen a Cloudinary
+    const uploadResult = await cloudinaryUpload(imagenProducto.buffer);
+    if (!uploadResult) {
+      return res.status(500).json({ message: 'Error al subir imagen a Cloudinary' });
+    }
+    // Crear producto con la URL de Cloudinary
+    const nuevoProducto = new productos({
+      ...req.body,
+      imagenProducto: uploadResult,
+    });
     const productoGuardado = await nuevoProducto.save();
     res.status(201).json(productoGuardado);
   } catch (error) {
@@ -25,7 +42,18 @@ export const createProducto = async (req, res) => {
 export const updateProducto = async (req, res) => {
   try {
     const { id } = req.params;
-    const productoActualizado = await productos.findByIdAndUpdate(id, req.body, { new: true });
+    const imagenProducto = req.file;
+    let datosActualizacion = req.body;
+
+    // Si hay nueva imagen, subirla a Cloudinary
+    if (imagenProducto) {
+      const uploadResult = await cloudinaryUpload(imagenProducto.buffer);
+      datosActualizacion.imagenProducto = uploadResult;
+    }
+
+    const productoActualizado = await productos.findByIdAndUpdate(id, datosActualizacion, {
+      new: true,
+    });
     if (!productoActualizado) {
       return res.status(404).json({ message: 'Producto no encontrado' });
     }
