@@ -6,27 +6,44 @@ export const loginAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    // 1️ Validar datos enviados
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Email y contraseña son obligatorios",
+      });
+    }
+
+    // 2️ Buscar usuario
     const admin = await Admin.findOne({ email });
 
-    if (!admin) {
-      return res.status(404).json({
-        messagge: "error de usuario o contraseña",
-      });
-    }
-    const valid = await bcrypt.compare(password, admin.password);
-    if (!valid) {
-      return res.status(404).json({
-        messagge: "error de usuario o contraseña",
+    // 3️ Validar credenciales
+    if (!admin || !(await bcrypt.compare(password, admin.password))) {
+      return res.status(401).json({
+        message: "Credenciales inválidas",
       });
     }
 
-    const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET, {
-      expiresIn: "8h",
+    // 4️ Generar token
+    const token = jwt.sign(
+      { id: admin._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "8h" }
+    );
+
+    // 5️ Respuesta exitosa
+    res.status(200).json({
+      message: "Login exitoso",
+      token,
+      user: {
+        id: admin._id,
+        email: admin.email,
+      },
     });
 
-    res.json({ messagge: "Login exitoso", token });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({
+      message: "Error interno del servidor",
+    });
   }
 };
-
