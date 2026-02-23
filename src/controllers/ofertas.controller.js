@@ -4,7 +4,7 @@ import Oferta from "../models/Oferta.js";
 
 export const traerOfertas = async (req, res) => {
   try {
-    const ofertas = await Oferta.find({ ofertaActivo: true });
+    const ofertas = await Oferta.find({ ofertaActiva: true });
     if (!ofertas) {
       return res.status(404).json({ message: "No se encontraron ofertas" });
     }
