@@ -8,9 +8,11 @@ const productoSchema = new mongoose.Schema({
     required: true,
   },
   imagenProducto: { type: String, required: true },
-  precioActual: { type: Number, required: true },
-  precioAnterior: { type: Number },
+  precioLista: { type: Number, required: true },
+  precioOferta: { type: Number },
   productoActivo: { type: Boolean, required: true, default: true },
+  porcentajeDescuento: { type: Number }, // fixed typo
+  descripcion: { type: String },
 });
 
 export default mongoose.model("Producto", productoSchema);

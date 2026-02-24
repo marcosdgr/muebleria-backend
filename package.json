@@ -19,6 +19,7 @@
     "express": "^5.2.1",
     "joi": "^18.0.2",
     "jsonwebtoken": "^9.0.3",
+    "mongodb": "^7.1.0",
     "mongoose": "^9.2.1",
     "multer": "^2.0.2"
   },

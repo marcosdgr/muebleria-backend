@@ -14,8 +14,10 @@ export const getProductos = async (req, res) => {
 };
 
 export const createProducto = async (req, res) => {
+
   try {
     const imagenProducto = req.file;
+
 
     // Validar que existe la imagen
     if (!imagenProducto) {
