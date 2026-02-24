@@ -13,6 +13,7 @@ const productoSchema = new mongoose.Schema({
   productoActivo: { type: Boolean, required: true, default: true },
   porcentajeDescuento: { type: Number }, // fixed typo
   descripcion: { type: String },
+  plantillaId:{ type:String}
 });
 
 export default mongoose.model('Producto', productoSchema);

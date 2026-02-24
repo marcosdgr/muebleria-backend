@@ -32,6 +32,7 @@ export const createProductoSchema = Joi.object({
   descripcion: Joi.string().max(500).optional().allow(''),
 
   productoActivo: Joi.boolean().required(),
+  plantillaId: Joi.string().optional().allow(null)
 });
 
 export const updateProductoSchema = Joi.object({
@@ -60,6 +61,7 @@ export const updateProductoSchema = Joi.object({
     'string.max': 'Máximo 500 caracteres',
   }),
   productoActivo: Joi.boolean(),
+  plantillaId: Joi.string().optional().allow(null)
 })
   .min(1)
   .messages({

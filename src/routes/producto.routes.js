@@ -3,6 +3,7 @@ import upload from '../config/multer.js';
 import {
   createProducto,
   deleteProducto,
+  getAllProductos,
   getProductos,
   ManejarEstadoProducto,
   updateProducto,
@@ -13,6 +14,7 @@ import { createProductoSchema, updateProductoSchema } from '../validators/produc
 
 const router = Router();
 
+router.get('/all', getAllProductos)
 router.get('/', getProductos);
 
 router.post(
@@ -26,7 +28,6 @@ router.put('/estado/:id', ManejarEstadoProducto);
 router.put(
   '/:id',
   upload.single('imagenProducto'),
-  validateImage,
   validate(updateProductoSchema),
   updateProducto
 );

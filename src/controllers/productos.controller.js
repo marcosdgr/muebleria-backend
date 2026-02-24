@@ -4,17 +4,50 @@ import { removeBackground } from '../services/removeBg.services.js';
 
 export const getProductos = async (req, res) => {
   try {
-    const data = await productos.find({ productoActivo: true });
+    const { page = 1, limit = 10 } = req.query;
+    const skip = (page - 1) * limit;
+
+    // Obtener los productos paginados
+    const data = await productos.find().skip(skip).limit(parseInt(limit));
+    
+    // Obtener el total de productos
+    const total = await productos.countDocuments();
+    
+    // Calcular el total de páginas
+    const totalPages = Math.ceil(total / limit);
+
     if (!data) {
       return res.status(404).json({ message: 'No se encontraron productos' });
     }
-    res.status(200).json(data);
+
+    // Devolver la estructura que el frontend espera
+    res.status(200).json({
+      productos: data,
+      total: total,
+      totalPages: totalPages,
+      page: parseInt(page),
+      limit: parseInt(limit)
+    });
   } catch (error) {
     res.status(500).json({ message: 'Error al obtener productos', error: error.message });
   }
 };
+//obtener productos sin paginacion
+export const getAllProductos = async (req, res) => {
+  try {
+    const data = await productos.find({productoActivo: true});
+    if (!data) {
+      return res.status(404).json({ message: 'No se encontraron productos' });
+    }
+    res.status(200).json(data);
+  }
+    catch (error) {
+    res.status(500).json({ message: 'Error al obtener productos', error: error.message });
+  }
+}
 
 export const createProducto = async (req, res) => {
+  console.log('Archivo recibido:', req.body);
   try {
     const imagenProducto = req.file;
 
@@ -42,28 +75,41 @@ export const createProducto = async (req, res) => {
   }
 };
 
+// controllers/productos.controller.js
 export const updateProducto = async (req, res) => {
   try {
     const { id } = req.params;
-    const imagenProducto = req.file;
-    let datosActualizacion = req.body;
 
-    // Si hay nueva imagen, subirla a Cloudinary
-    if (imagenProducto) {
-      const imagenSinFondo = await removeBackground(imagenProducto.buffer);
+    // copiamos todo lo recibido en el body
+    const cambios = { ...req.body };
+
+    // si hay imagen nueva, aplicamos el mismo flujo que en create
+    if (req.file) {
+      const imagenSinFondo = await removeBackground(req.file.buffer);
       const uploadResult = await cloudinaryUpload(imagenSinFondo);
-      datosActualizacion.imagenProducto = uploadResult;
+      if (!uploadResult) {
+        return res
+          .status(500)
+          .json({ message: 'Error al subir imagen a Cloudinary' });
+      }
+      cambios.imagenProducto = uploadResult;
     }
 
-    const productoActualizado = await productos.findByIdAndUpdate(id, datosActualizacion, {
-      new: true,
-    });
+    const productoActualizado = await productos.findByIdAndUpdate(
+      id,
+      cambios,
+      { new: true }
+    );
+
     if (!productoActualizado) {
       return res.status(404).json({ message: 'Producto no encontrado' });
     }
+
     res.status(200).json(productoActualizado);
   } catch (error) {
-    res.status(500).json({ message: 'Error al actualizar producto', error: error.message });
+    res
+      .status(500)
+      .json({ message: 'Error al actualizar producto', error: error.message });
   }
 };
 
