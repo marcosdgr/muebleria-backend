@@ -8,14 +8,12 @@ import {
   updateProducto,
 } from '../controllers/productos.controller.js';
 import { validateImage } from '../middlewares/validate.image.js';
-
-
+import validate from '../middlewares/validate.middleware.js';
+import { createProductoSchema, updateProductoSchema } from '../validators/producto.validator.js';
 
 const router = Router();
 
 router.get('/', getProductos);
-import validate from '../middlewares/validate.middleware.js';
-import { createProductoSchema, updateProductoSchema } from '../validators/producto.validator.js';
 
 router.post(
   '/',

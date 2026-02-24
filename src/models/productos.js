@@ -1,10 +1,10 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const productoSchema = new mongoose.Schema({
   titulo: { type: String, required: true },
   categoria: {
     type: String,
-    enum: ["Cocina", "Living", "Dormitorio", "Jardin", "Varios"],
+    enum: ['Cocina', 'Living', 'Dormitorio', 'Jardin', 'Varios'],
     required: true,
   },
   imagenProducto: { type: String, required: true },
@@ -15,4 +15,4 @@ const productoSchema = new mongoose.Schema({
   descripcion: { type: String },
 });
 
-export default mongoose.model("Producto", productoSchema);
+export default mongoose.model('Producto', productoSchema);

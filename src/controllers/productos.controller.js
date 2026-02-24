@@ -1,5 +1,6 @@
 import { cloudinaryUpload } from '../helpers/cloduniaryHelpers.js';
 import productos from '../models/productos.js';
+import { removeBackground } from '../services/removeBg.services.js';
 
 export const getProductos = async (req, res) => {
   try {
@@ -14,18 +15,18 @@ export const getProductos = async (req, res) => {
 };
 
 export const createProducto = async (req, res) => {
-
   try {
     const imagenProducto = req.file;
-
 
     // Validar que existe la imagen
     if (!imagenProducto) {
       return res.status(400).json({ message: 'La imagen es requerida' });
     }
+    //aqui llamamos a la funcion para eliminar el fondo de la imagen antes de subirla a cloudinary
+    const imagenSinFondo = await removeBackground(imagenProducto.buffer);
 
     // Subir imagen a Cloudinary
-    const uploadResult = await cloudinaryUpload(imagenProducto.buffer);
+    const uploadResult = await cloudinaryUpload(imagenSinFondo);
     if (!uploadResult) {
       return res.status(500).json({ message: 'Error al subir imagen a Cloudinary' });
     }
@@ -49,7 +50,8 @@ export const updateProducto = async (req, res) => {
 
     // Si hay nueva imagen, subirla a Cloudinary
     if (imagenProducto) {
-      const uploadResult = await cloudinaryUpload(imagenProducto.buffer);
+      const imagenSinFondo = await removeBackground(imagenProducto.buffer);
+      const uploadResult = await cloudinaryUpload(imagenSinFondo);
       datosActualizacion.imagenProducto = uploadResult;
     }
 
