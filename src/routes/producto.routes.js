@@ -1,22 +1,36 @@
 import Router from 'express';
+import upload from '../config/multer.js';
 import {
   createProducto,
   deleteProducto,
+  getAllProductos,
   getProductos,
-  updateProducto,
   ManejarEstadoProducto,
+  updateProducto,
 } from '../controllers/productos.controller.js';
-import upload from '../config/multer.js';
+import { validateImage } from '../middlewares/validate.image.js';
 import validate from '../middlewares/validate.middleware.js';
-import { createProductoSchema } from '../validators/producto.validator.js';
+import { createProductoSchema, updateProductoSchema } from '../validators/producto.validator.js';
 
 const router = Router();
 
+router.get('/all', getAllProductos)
 router.get('/', getProductos);
-router.post('/', upload.single('imagenProducto'), validate(createProductoSchema), createProducto);
-router.put('/estado/:id', ManejarEstadoProducto);
-router.put('/:id', upload.single('imagenProducto'), updateProducto);
-router.delete('/:id', deleteProducto);
 
+router.post(
+  '/',
+  upload.array('imagenProducto'),
+  validateImage,
+  validate(createProductoSchema),
+  createProducto
+);
+router.put('/estado/:id', ManejarEstadoProducto);
+router.put(
+  '/:id',
+  upload.array('imagenProducto'),
+  validate(updateProductoSchema),
+  updateProducto
+);
+router.delete('/:id', deleteProducto);
 
 export default router;
