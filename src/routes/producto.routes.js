@@ -19,7 +19,7 @@ router.get('/', getProductos);
 
 router.post(
   '/',
-  upload.single('imagenProducto'),
+  upload.array('imagenProducto'),
   validateImage,
   validate(createProductoSchema),
   createProducto
@@ -27,7 +27,7 @@ router.post(
 router.put('/estado/:id', ManejarEstadoProducto);
 router.put(
   '/:id',
-  upload.single('imagenProducto'),
+  upload.array('imagenProducto'),
   validate(updateProductoSchema),
   updateProducto
 );
