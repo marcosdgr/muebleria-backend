@@ -166,3 +166,17 @@ export const deleteProducto = async (req, res) => {
     res.status(500).json({ message: 'Error al eliminar producto', error: error.message });
   }
 };
+
+//funcion para buscar productos por categoria
+export const getProductosByCategoria = async (req, res) => {
+  try {
+    const { categoria } = req.params;
+    const productosEncontrados = await productos.find({
+      categoria: categoria,
+      productoActivo: true
+    });
+    res.status(200).json(productosEncontrados);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al buscar', error: error.message });
+  }
+}

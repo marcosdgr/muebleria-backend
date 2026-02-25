@@ -7,7 +7,8 @@ import {
   getProductos,
   ManejarEstadoProducto,
   updateProducto,
-  searchProductos
+  searchProductos,
+  getProductosByCategoria
 } from '../controllers/productos.controller.js';
 import { validateImage } from '../middlewares/validate.image.js';
 import validate from '../middlewares/validate.middleware.js';
@@ -19,6 +20,7 @@ const router = Router();
 // Rutas públicas (GET)
 router.get('/all', getAllProductos)
 router.get('/search', searchProductos);
+router.get('/categoria/:categoria', getProductosByCategoria);
 router.get('/', getProductos);
 
 
