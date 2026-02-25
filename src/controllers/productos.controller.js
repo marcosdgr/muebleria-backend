@@ -119,12 +119,12 @@ export const updateProducto = async (req, res) => {
       .json({ message: 'Error al actualizar producto', error: error.message });
   }
 };
-// buscar producto por nombre o coicidencia
+// buscar producto por nombre o coincidencia
 export const searchProductos = async (req, res) => {
   try {
     const { query } = req.query;
     const productosEncontrados = await productos.find({
-      nombre: { $regex: query, $options: 'i' },
+      titulo: { $regex: query, $options: 'i' },
       productoActivo: true
     });
     res.status(200).json(productosEncontrados);

@@ -18,8 +18,9 @@ const router = Router();
 
 // Rutas públicas (GET)
 router.get('/all', getAllProductos)
-router.get('/', getProductos);
 router.get('/search', searchProductos);
+router.get('/', getProductos);
+
 
 // Rutas protegidas (POST, PUT, DELETE) - requieren autenticación
 router.post(
