@@ -5,6 +5,7 @@ export default function validate(schema) {
     const { error, value } = schema.validate(req.body, {
       abortEarly: false,
       stripUnknown: true,
+      convert:true, // Permite convertir tipos automáticamente (ej. "true" a true, "123" a 123)
     });
 
     if (error) {

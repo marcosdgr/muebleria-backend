@@ -4,36 +4,72 @@ import { removeBackground } from '../services/removeBg.services.js';
 
 export const getProductos = async (req, res) => {
   try {
-    const data = await productos.find({ productoActivo: true });
+    const { page = 1, limit = 10 } = req.query;
+    const skip = (page - 1) * limit;
+
+    // Obtener los productos paginados
+    const data = await productos.find().skip(skip).limit(parseInt(limit));
+    
+    // Obtener el total de productos
+    const total = await productos.countDocuments();
+    
+    // Calcular el total de páginas
+    const totalPages = Math.ceil(total / limit);
+
     if (!data) {
       return res.status(404).json({ message: 'No se encontraron productos' });
     }
-    res.status(200).json(data);
+
+    // Devolver la estructura que el frontend espera
+    res.status(200).json({
+      productos: data,
+      total: total,
+      totalPages: totalPages,
+      page: parseInt(page),
+      limit: parseInt(limit)
+    });
   } catch (error) {
     res.status(500).json({ message: 'Error al obtener productos', error: error.message });
   }
 };
+//obtener productos sin paginacion
+export const getAllProductos = async (req, res) => {
+  try {
+    const data = await productos.find({productoActivo: true});
+    if (!data) {
+      return res.status(404).json({ message: 'No se encontraron productos' });
+    }
+    res.status(200).json(data);
+  }
+    catch (error) {
+    res.status(500).json({ message: 'Error al obtener productos', error: error.message });
+  }
+}
 
 export const createProducto = async (req, res) => {
+  console.log('Archivos recibidos:', { body: req.body, files: req.files && req.files.map(f => f.originalname) });
   try {
-    const imagenProducto = req.file;
+    const files = req.files;
 
-    // Validar que existe la imagen
-    if (!imagenProducto) {
+    if (!files || files.length === 0) {
       return res.status(400).json({ message: 'La imagen es requerida' });
     }
-    //aqui llamamos a la funcion para eliminar el fondo de la imagen antes de subirla a cloudinary
-    const imagenSinFondo = await removeBackground(imagenProducto.buffer);
-
-    // Subir imagen a Cloudinary
-    const uploadResult = await cloudinaryUpload(imagenSinFondo);
-    if (!uploadResult) {
-      return res.status(500).json({ message: 'Error al subir imagen a Cloudinary' });
+    if (files.length > 3) {
+      return res.status(400).json({ message: 'Máximo 3 imágenes permitidas' });
     }
-    // Crear producto con la URL de Cloudinary
+
+    const uploadResults = await Promise.all(
+      files.map(async (file) => {
+        const imagenSinFondo = await removeBackground(file.buffer);
+        const url = await cloudinaryUpload(imagenSinFondo);
+        if (!url) throw new Error('Error al subir imagen a Cloudinary');
+        return url;
+      })
+    );
+
     const nuevoProducto = new productos({
       ...req.body,
-      imagenProducto: uploadResult,
+      imagenProducto: uploadResults,
     });
     const productoGuardado = await nuevoProducto.save();
     res.status(201).json(productoGuardado);
@@ -42,28 +78,45 @@ export const createProducto = async (req, res) => {
   }
 };
 
+// controllers/productos.controller.js
 export const updateProducto = async (req, res) => {
   try {
     const { id } = req.params;
-    const imagenProducto = req.file;
-    let datosActualizacion = req.body;
 
-    // Si hay nueva imagen, subirla a Cloudinary
-    if (imagenProducto) {
-      const imagenSinFondo = await removeBackground(imagenProducto.buffer);
-      const uploadResult = await cloudinaryUpload(imagenSinFondo);
-      datosActualizacion.imagenProducto = uploadResult;
+    // copiamos todo lo recibido en el body
+    const cambios = { ...req.body };
+
+    // si hay imágenes nuevas, procesamos hasta 3
+    if (req.files && req.files.length > 0) {
+      if (req.files.length > 3) {
+        return res.status(400).json({ message: 'Máximo 3 imágenes permitidas' });
+      }
+      const uploadResults = await Promise.all(
+        req.files.map(async (file) => {
+          const imagenSinFondo = await removeBackground(file.buffer);
+          const url = await cloudinaryUpload(imagenSinFondo);
+          if (!url) throw new Error('Error al subir imagen a Cloudinary');
+          return url;
+        })
+      );
+      cambios.imagenProducto = uploadResults;
     }
 
-    const productoActualizado = await productos.findByIdAndUpdate(id, datosActualizacion, {
-      new: true,
-    });
+    const productoActualizado = await productos.findByIdAndUpdate(
+      id,
+      cambios,
+      { new: true }
+    );
+
     if (!productoActualizado) {
       return res.status(404).json({ message: 'Producto no encontrado' });
     }
+
     res.status(200).json(productoActualizado);
   } catch (error) {
-    res.status(500).json({ message: 'Error al actualizar producto', error: error.message });
+    res
+      .status(500)
+      .json({ message: 'Error al actualizar producto', error: error.message });
   }
 };
 
