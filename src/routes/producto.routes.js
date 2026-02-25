@@ -7,6 +7,7 @@ import {
   getProductos,
   ManejarEstadoProducto,
   updateProducto,
+  searchProductos
 } from '../controllers/productos.controller.js';
 import { validateImage } from '../middlewares/validate.image.js';
 import validate from '../middlewares/validate.middleware.js';
@@ -18,6 +19,7 @@ const router = Router();
 // Rutas públicas (GET)
 router.get('/all', getAllProductos)
 router.get('/', getProductos);
+router.get('/search', searchProductos);
 
 // Rutas protegidas (POST, PUT, DELETE) - requieren autenticación
 router.post(

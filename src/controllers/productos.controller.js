@@ -119,7 +119,19 @@ export const updateProducto = async (req, res) => {
       .json({ message: 'Error al actualizar producto', error: error.message });
   }
 };
-
+// buscar producto por nombre o coicidencia
+export const searchProductos = async (req, res) => {
+  try {
+    const { query } = req.query;
+    const productosEncontrados = await productos.find({
+      nombre: { $regex: query, $options: 'i' },
+      productoActivo: true
+    });
+    res.status(200).json(productosEncontrados);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al buscar productos', error: error.message });
+  }     
+}
 //funcion para descativar un producto sin eliminarlo de la base de datos
 export const ManejarEstadoProducto = async (req, res) => {
   try {
