@@ -119,7 +119,19 @@ export const updateProducto = async (req, res) => {
       .json({ message: 'Error al actualizar producto', error: error.message });
   }
 };
-
+// buscar producto por nombre o coincidencia
+export const searchProductos = async (req, res) => {
+  try {
+    const { query } = req.query;
+    const productosEncontrados = await productos.find({
+      titulo: { $regex: query, $options: 'i' },
+      productoActivo: true
+    });
+    res.status(200).json(productosEncontrados);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al buscar productos', error: error.message });
+  }     
+}
 //funcion para descativar un producto sin eliminarlo de la base de datos
 export const ManejarEstadoProducto = async (req, res) => {
   try {
@@ -154,3 +166,17 @@ export const deleteProducto = async (req, res) => {
     res.status(500).json({ message: 'Error al eliminar producto', error: error.message });
   }
 };
+
+//funcion para buscar productos por categoria
+export const getProductosByCategoria = async (req, res) => {
+  try {
+    const { categoria } = req.params;
+    const productosEncontrados = await productos.find({
+      categoria: categoria,
+      productoActivo: true
+    });
+    res.status(200).json(productosEncontrados);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al buscar', error: error.message });
+  }
+}
