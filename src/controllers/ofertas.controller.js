@@ -1,4 +1,4 @@
-import Oferta from "../models/Oferta.js";
+import Oferta from "../models/oferta.js";
 
 // Obtener todas las ofertas
 
