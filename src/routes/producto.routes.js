@@ -7,40 +7,29 @@ import {
   getProductos,
   ManejarEstadoProducto,
   updateProducto,
-  searchProductos,
-  getProductosByCategoria
+  bulkUpdateDiscount,
+  bulkUpdateTemplate,
 } from '../controllers/productos.controller.js';
 import { validateImage } from '../middlewares/validate.image.js';
 import validate from '../middlewares/validate.middleware.js';
-import { verifyToken } from '../middlewares/auth.middleware.js';
 import { createProductoSchema, updateProductoSchema } from '../validators/producto.validator.js';
 
 const router = Router();
 
-// Rutas públicas (GET)
-router.get('/all', getAllProductos)
-router.get('/search', searchProductos);
-router.get('/categoria/:categoria', getProductosByCategoria);
+router.get('/all', getAllProductos);
 router.get('/', getProductos);
 
-
-// Rutas protegidas (POST, PUT, DELETE) - requieren autenticación
 router.post(
   '/',
-  verifyToken,
   upload.array('imagenProducto'),
   validateImage,
   validate(createProductoSchema),
   createProducto
 );
-router.put('/estado/:id', verifyToken, ManejarEstadoProducto);
-router.put(
-  '/:id',
-  verifyToken,
-  upload.array('imagenProducto'),
-  validate(updateProductoSchema),
-  updateProducto
-);
-router.delete('/:id', verifyToken, deleteProducto);
+router.put('/bulk-discount', bulkUpdateDiscount);
+router.put('/bulk-template', bulkUpdateTemplate);
+router.put('/estado/:id', ManejarEstadoProducto);
+router.put('/:id', upload.array('imagenProducto'), validate(updateProductoSchema), updateProducto);
+router.delete('/:id', deleteProducto);
 
 export default router;
