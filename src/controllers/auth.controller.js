@@ -13,7 +13,7 @@ export const loginAdmin = async (req, res) => {
       });
     }
 
-    // 2️ Buscar usuario
+    // 2️ Buscar usuario h
     const admin = await Admin.findOne({ email });
 
     // 3️ Validar credenciales

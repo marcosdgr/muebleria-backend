@@ -6,13 +6,13 @@ dotenv.config();
 
 await mongoose.connect(process.env.MONGO_URI);
 
-const hash = await bcrypt.hash("123456", 10);
+const hash = await bcrypt.hash("muebleria0703", 10);
 
 await Admin.create({
 email: "admin1@mail.com",
 password: hash
 });
 
-console.log("Admin creado");
+console.log("Admin creado exitosamente");
 
 process.exit();
